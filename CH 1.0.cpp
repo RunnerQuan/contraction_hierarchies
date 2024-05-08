@@ -24,8 +24,6 @@ typedef priority_queue<Node, vector<Node>, greater<Node>> DijkstraQueue;  // 最
 
 const ll INF = 1e15 + 10;  // 无穷大
 
-// 填加了一段测试注释
-
 // ifstream graph("NY_graph.txt");  // 读取图
 // ifstream queries("Queries.txt"); // 读取查询
 ifstream graph("test1.txt");
@@ -457,5 +455,3 @@ int main() {
 
     return 0;
 }
-
-// 添加了一个测试文件修改的注释
