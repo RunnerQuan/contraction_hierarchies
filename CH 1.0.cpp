@@ -450,8 +450,5 @@ int main() {
     string term;
     getline(cin, term);
 
-    // 无用的测试函数
-    cout << "Hello World!" << endl;
-
     return 0;
 }
