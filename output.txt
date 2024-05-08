@@ -1,0 +1,70 @@
+Added 24 shortcuts:
+	2 -> 12 -> 22 -> 10
+	2 -> 20 -> 4 -> 5 -> 23 -> 6
+	6 -> 23 -> 5 -> 10
+	2 -> 20 -> 4 -> 5
+	6 -> 7 -> 17
+	2 -> 3 -> 18
+	17 -> 25 -> 11
+	17 -> 25 -> 11 -> 24
+	5 -> 23 -> 6
+	10 -> 5 -> 23 -> 6
+	24 -> 11 -> 25 -> 17
+	11 -> 25 -> 17
+	2 -> 20 -> 4
+	18 -> 3 -> 2
+	4 -> 20 -> 2
+	10 -> 22 -> 12 -> 2
+	10 -> 22 -> 12
+	6 -> 23 -> 5 -> 4 -> 20 -> 2
+	17 -> 7 -> 6
+	12 -> 22 -> 10
+	5 -> 4 -> 20 -> 2
+	6 -> 23 -> 5
+	10 -> 24 -> 11 -> 25 -> 17
+	17 -> 25 -> 11 -> 24 -> 10
+
+Preprocessing time: 0.016s
+
+Shortest path distance from 2 to 6 : 329
+	2 -> 20 -> 4 -> 5 -> 23 -> 6
+Time: 0s
+
+Shortest path distance from 12 to 7 : 390
+	12 -> 22 -> 10 -> 24 -> 11 -> 25 -> 17 -> 7
+Time: 0s
+
+Shortest path distance from 11 to 6 : 310
+	11 -> 25 -> 17 -> 7 -> 6
+Time: 0s
+
+Shortest path distance from 1 to 6 : 619
+	1 -> 18 -> 3 -> 2 -> 20 -> 4 -> 5 -> 23 -> 6
+Time: 0s
+
+Shortest path distance from 12 to 8 : 460
+	12 -> 22 -> 10 -> 5 -> 23 -> 6 -> 8
+Time: 0s
+
+Shortest path distance from 9 to 16 : 242
+	9 -> 4 -> 20 -> 2 -> 12 -> 14 -> 21 -> 16
+Time: 0s
+
+Shortest path distance from 15 to 7 : 487
+	15 -> 14 -> 12 -> 22 -> 10 -> 24 -> 11 -> 25 -> 17 -> 7
+Time: 0.004s
+
+Shortest path distance from 13 to 5 : 200
+	13 -> 19 -> 12 -> 22 -> 10 -> 5
+Time: 0s
+
+Shortest path distance from 1 to 17 : 720
+	1 -> 18 -> 3 -> 2 -> 12 -> 22 -> 10 -> 24 -> 11 -> 25 -> 17
+Time: 0s
+
+Shortest path distance from 1 to 10 : 470
+	1 -> 18 -> 3 -> 2 -> 12 -> 22 -> 10
+Time: 0s
+
+
+Average query time: 0.0004s
