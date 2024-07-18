@@ -72704,19 +72704,19 @@ Added 3142 shortcuts:
 	1926 -> 152 -> 434 -> 152 -> 68
 	68 -> 152 -> 434 -> 152 -> 1926
 
-Preprocessing time: 8073.32s
+Preprocessing time: 6389.26s
 
 Shortest path distance from 2 to 6 : 1165
 	2 -> 1862 -> 1535 -> 1753 -> 218 -> 1662 -> 64 -> 1969 -> 472 -> 1077 -> 1973 -> 570 -> 200 -> 120 -> 6
-Time: 0.003s
+Time: 0.004s
 
 Shortest path distance from 12 to 7 : -1
 	
-Time: 0.001s
+Time: 0s
 
 Shortest path distance from 11 to 6 : 1107
 	11 -> 1267 -> 11 -> 158 -> 459 -> 1151 -> 755 -> 1053 -> 1938 -> 1165 -> 367 -> 258 -> 1409 -> 258 -> 135 -> 1107 -> 18 -> 1830 -> 658 -> 120 -> 6
-Time: 0.006s
+Time: 0.005s
 
 Shortest path distance from 1 to 6 : 1176
 	1 -> 298 -> 1926 -> 623 -> 1668 -> 1037 -> 1557 -> 1902 -> 344 -> 240 -> 850 -> 240 -> 140 -> 135 -> 1107 -> 18 -> 1830 -> 658 -> 120 -> 6
@@ -72728,11 +72728,11 @@ Time: 0.001s
 
 Shortest path distance from 9 to 16 : 722
 	9 -> 518 -> 848 -> 770 -> 24 -> 227 -> 190 -> 227 -> 24 -> 1746 -> 16
-Time: 0.003s
+Time: 0.004s
 
 Shortest path distance from 15 to 7 : 1154
 	15 -> 192 -> 1329 -> 1475 -> 376 -> 1493 -> 312 -> 530 -> 312 -> 1012 -> 1792 -> 21 -> 632 -> 1786 -> 676 -> 168 -> 1671 -> 168 -> 1676 -> 7
-Time: 0.004s
+Time: 0.006s
 
 Shortest path distance from 13 to 5 : -1
 	
@@ -72740,11 +72740,23 @@ Time: 0.001s
 
 Shortest path distance from 1 to 17 : 730
 	1 -> 298 -> 1926 -> 1224 -> 480 -> 223 -> 852 -> 198 -> 1274 -> 1887 -> 211 -> 90 -> 1769 -> 1536 -> 1921 -> 1118 -> 17
-Time: 0.004s
+Time: 0.005s
 
 Shortest path distance from 1 to 8 : 482
 	1 -> 298 -> 1926 -> 1224 -> 480 -> 223 -> 852 -> 198 -> 706 -> 8
+Time: 0.003s
+
+Shortest path distance from 18 to 14 : 779
+	18 -> 1830 -> 1989 -> 872 -> 1786 -> 482 -> 854 -> 947 -> 1594 -> 725 -> 1634 -> 14
 Time: 0.004s
 
+Shortest path distance from 14 to 18 : -1
+	
+Time: 0s
 
-Average query time: 0.0032s
+Shortest path distance from 18 to 24 : 628
+	18 -> 1107 -> 135 -> 753 -> 256 -> 1460 -> 1376 -> 1479 -> 527 -> 1186 -> 190 -> 227 -> 24
+Time: 0.007s
+
+
+Average query time: 0.00346154s

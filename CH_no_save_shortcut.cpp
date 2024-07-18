@@ -534,7 +534,7 @@ public:
     CH_ChargeStation() {
         // 生成CH
         m = 0;
-        G = CH("test2.txt");
+        G = CH("2000.txt");
         // 预处理chargeStations
         completeChargeStations();
         // 预处理isCanNocharge
@@ -560,11 +560,11 @@ public:
     unordered_set<int> charge_stations; // 充电站集
     vector<vector<int>> is_can_no_charge; // 路程中是否不需要充电 -1 : 断路 -2 :可达但要充电  路程: 可达且不用充电
 
-    unordered_map<string, vector<int>> nodeToStation_shortcuts; // 保存预处理中普通节点到充电站的可达路径(未压缩)
+    //unordered_map<string, vector<int>> nodeToStation_shortcuts; // 保存预处理中普通节点到充电站的可达路径(未压缩)
     unordered_map<string, int> nodeToStation_shortcut_weight; // 保存预处理中普通节点到充电站的可达路径的权重
     unordered_map<int, vector<int>> nodeToStation; // 保存普通节点周围的可达充电站 -- 正向(node --> station), key -- node
 
-    unordered_map<string, vector<int>> stationToNode_shortcuts; // 保存预处理中充电站到普通节点的可达路径(未压缩)
+    //unordered_map<string, vector<int>> stationToNode_shortcuts; // 保存预处理中充电站到普通节点的可达路径(未压缩)
     unordered_map<string, int> stationToNode_shortcut_weight; // 保存预处理中充电站到普通节点的可达路径的权重
     unordered_map<int, vector<int>> stationToNode; // 保存普通节点周围的可达充电站 -- 反向(node <-- station), key -- node
 
@@ -572,7 +572,7 @@ public:
     unordered_map<string, int> stationToStation_shortcut_weight; // 保存预处理中充电站到充电站的可达路径的权重
     unordered_map<int, vector<int>> stationToStation; // 保存充电站周围的可达充电站
 
-    unordered_map<string, vector<int>> nodeToNode_in_G_ChargeStation_shortcuts; // 保存G_ChargeStation图中节点到节点的路径(未压缩)
+    //unordered_map<string, vector<int>> nodeToNode_in_G_ChargeStation_shortcuts; // 保存G_ChargeStation图中节点到节点的路径(未压缩)
     unordered_map<string, int> nodeToNode_in_G_ChargeStation_shortcut_weight; // 保存G_ChargeStation图中节点到节点路径权重
     unordered_map<int, vector<int>> nodeToNode_in_G_ChargeStation; // 保存G_ChargeStation图中节点到节点
 
@@ -616,8 +616,7 @@ public:
             // 判断是不是充电站
             if (charge_stations.find(i) != charge_stations.end()) continue;
             for (int j = 0, J = G.stations.size(); j < J; j++) {
-                vector<int> path;
-                int weight = G.Query(i, G.stations[j], path);
+                int weight = G.QueryWithoutPath(i, G.stations[j]);
                 if (weight == -1) continue;
                 // 判断在最大行驶里程（考虑心理阈值）可达
                 if (G.isCanDriveThisWay(weight)) {
@@ -625,7 +624,6 @@ public:
                     string str_node = to_string(i);
                     string str_station = to_string(G.stations[j]);
                     string node_station = str_node + "?" + str_station;
-                    nodeToStation_shortcuts[node_station] = path;
                     nodeToStation_shortcut_weight[node_station] = weight;
                 }
             }
@@ -641,15 +639,13 @@ public:
             for (int j = 1; j <= G.n; j++) {
                 // 判断是不是充电站
                 if (charge_stations.find(j) != charge_stations.end()) continue;
-                vector<int> path;
-                int weight = G.Query(G.stations[i], j, path);
+                int weight = G.QueryWithoutPath(G.stations[i], j);
                 if (weight == -1) continue;
                 if (G.isCanDriveThisWay(weight)) {
                     stationToNode[j].push_back(G.stations[i]);
                     string str_station = to_string(G.stations[i]);
                     string str_node = to_string(j);
                     string station_node = str_station + "?" + str_node;
-                    stationToNode_shortcuts[station_node] = path;
                     stationToNode_shortcut_weight[station_node] = weight;
                 }
             }
@@ -713,20 +709,16 @@ public:
         for (int i = 0, I = G_ChargeStation.stations.size(); i < I; i++) {
             for (int j = 0, J = G_ChargeStation.stations.size(); j < J; j++) {
                 if (i == j) continue;
-                vector<int> path;
-                int weight = G_ChargeStation.Query(G_ChargeStation.stations[i], G_ChargeStation.stations[j], path);
+                int weight = G_ChargeStation.QueryWithoutPath(G_ChargeStation.stations[i], G_ChargeStation.stations[j]);
                 if (weight == -1)continue;
                 nodeToNode_in_G_ChargeStation[G.stations[i]].push_back(G.stations[j]);
                 string str_station1 = to_string(G.stations[i]);
                 string str_station2 = to_string(G.stations[j]);
                 string station1_stations2 = str_station1 + "?" + str_station2;
-                decompressPath(path);
-                nodeToNode_in_G_ChargeStation_shortcuts[station1_stations2] = path;
                 nodeToNode_in_G_ChargeStation_shortcut_weight[station1_stations2] = weight;
             }
         }
         // 处理路程只经过一个充电站
-        nodeToNode_in_G_ChargeStation_shortcuts[""] = vector<int>();
         nodeToNode_in_G_ChargeStation_shortcut_weight[""] = 0;
         cout << "completeNodeToNode_in_G_ChargeStation end" << endl;
     }
@@ -758,8 +750,9 @@ public:
             // 如果s和t都是充电站
             if (charge_stations.find(s) != charge_stations.end() && charge_stations.find(t) != charge_stations.end()) {
                 string s_t = to_string(s) + "?" + to_string(t);
-                if (nodeToNode_in_G_ChargeStation_shortcuts.find(s_t) != nodeToNode_in_G_ChargeStation_shortcuts.end()) {
-                    path = nodeToNode_in_G_ChargeStation_shortcuts[s_t];
+                if (nodeToNode_in_G_ChargeStation_shortcut_weight.find(s_t) != nodeToNode_in_G_ChargeStation_shortcut_weight.end()) {
+                    G_ChargeStation.Query(s, t, path);
+                    decompressPath(path);
                     return nodeToNode_in_G_ChargeStation_shortcut_weight[s_t];
                 }
                 return -1;
@@ -768,6 +761,7 @@ public:
             else if (charge_stations.find(s) == charge_stations.end() && charge_stations.find(t) != charge_stations.end()) {
                 // 筛选s能到达的充电站
                 int sum_weight = INF;
+                int x_node = -1;
                 string s_x_ = "", x_t_ = "";
                 for (auto& x : nodeToStation[s]) {
                     string s_x = to_string(s) + "?" + to_string(x);
@@ -779,7 +773,7 @@ public:
                     if (x == t) x_t = "";
                     else x_t = to_string(x) + "?" + to_string(t);
                     int weight_x_t = 0;
-                    if (nodeToNode_in_G_ChargeStation_shortcuts.find(x_t) != nodeToNode_in_G_ChargeStation_shortcuts.end()) {
+                    if (nodeToNode_in_G_ChargeStation_shortcut_weight.find(x_t) != nodeToNode_in_G_ChargeStation_shortcut_weight.end()) {
                         weight_x_t = nodeToNode_in_G_ChargeStation_shortcut_weight[x_t];
                     }
                     else continue;
@@ -787,12 +781,21 @@ public:
                         sum_weight = weight_s_x + weight_x_t;
                         s_x_ = s_x;
                         x_t_ = x_t;
+                        x_node = x;
                     }
                 }
                 if (sum_weight != INF) {
                     // 将两段路径拼接
-                    path.insert(path.end(), nodeToStation_shortcuts[s_x_].begin(), nodeToStation_shortcuts[s_x_].end());
-                    if (x_t_ != "")path.insert(path.end(), nodeToNode_in_G_ChargeStation_shortcuts[x_t_].begin() + 1, nodeToNode_in_G_ChargeStation_shortcuts[x_t_].end());
+                    if (x_t_ == "") {
+                        G.Query(s, t, path);
+                    }
+                    else {
+                        G.Query(s, x_node, path);
+                        vector<int> path1;
+                        G_ChargeStation.Query(x_node, t, path1);
+                        decompressPath(path1);
+                        path.insert(path.end(), path1.begin() + 1, path1.end());
+                    }
                     return sum_weight;
                 }
                 return -1;
@@ -801,6 +804,7 @@ public:
             else if (charge_stations.find(s) != charge_stations.end() && charge_stations.find(t) == charge_stations.end()) {
                 // 筛选t能到达的充电站
                 int sum_weight = INF;
+                int x_node = -1;
                 string s_x_ = "", x_t_ = "";
                 for (auto& x : stationToNode[t]) {
                     string x_t = to_string(x) + "?" + to_string(t);
@@ -809,7 +813,7 @@ public:
                     if (s == x) s_x = "";
                     else s_x = to_string(s) + "?" + to_string(x);
                     int weight_s_x = 0;
-                    if (nodeToNode_in_G_ChargeStation_shortcuts.find(s_x) != nodeToNode_in_G_ChargeStation_shortcuts.end()) {
+                    if (nodeToNode_in_G_ChargeStation_shortcut_weight.find(s_x) != nodeToNode_in_G_ChargeStation_shortcut_weight.end()) {
                         weight_s_x = nodeToNode_in_G_ChargeStation_shortcut_weight[s_x];
                     }
                     else continue;
@@ -817,13 +821,21 @@ public:
                         sum_weight = weight_s_x + weight_x_t;
                         s_x_ = s_x;
                         x_t_ = x_t;
+                        x_node = x;
                     }
                 }
                 if (sum_weight != INF) {
                     // 将两段路径拼接
-                    if (s_x_ != "")path.insert(path.end(), nodeToNode_in_G_ChargeStation_shortcuts[s_x_].begin(), nodeToNode_in_G_ChargeStation_shortcuts[s_x_].end());
-                    else path.push_back(*stationToNode_shortcuts[x_t_].begin());
-                    path.insert(path.end(), stationToNode_shortcuts[x_t_].begin() + 1, stationToNode_shortcuts[x_t_].end());
+                    if (s_x_ == "") {
+                        G.Query(s, t, path);
+                    }
+                    else {
+                        G_ChargeStation.Query(s, x_node, path);
+                        decompressPath(path);
+                        vector<int> path1;
+                        G.Query(x_node, t, path1);
+                        path.insert(path.end(), path1.begin() + 1, path1.end());
+                    }
                     return sum_weight;
                 }
                 return -1;
@@ -832,6 +844,7 @@ public:
             else {
                 int sum_weight = INF;
                 string s_x_ = "", x_y_ = "", y_t_ = "";
+                int x_node = -1, y_node = -1;
                 for (auto& x : nodeToStation[s]) {
                     // 确定充电站x
                     string s_x = to_string(s) + "?" + to_string(x);
@@ -845,7 +858,7 @@ public:
                         if (x == y) x_y = "";
                         else x_y = to_string(x) + "?" + to_string(y);
                         int weight_x_y = 0;
-                        if (nodeToNode_in_G_ChargeStation_shortcuts.find(x_y) != nodeToNode_in_G_ChargeStation_shortcuts.end()) {
+                        if (nodeToNode_in_G_ChargeStation_shortcut_weight.find(x_y) != nodeToNode_in_G_ChargeStation_shortcut_weight.end()) {
                             weight_x_y = nodeToNode_in_G_ChargeStation_shortcut_weight[x_y];
                         }
                         else continue;
@@ -854,14 +867,29 @@ public:
                             s_x_ = s_x;
                             x_y_ = x_y;
                             y_t_ = y_t;
+                            x_node = x;
+                            y_node = y;
                         }
                     }
                 }
                 if (sum_weight != INF) {
                     // 将三段路径拼接
-                    path.insert(path.end(), nodeToStation_shortcuts[s_x_].begin(), nodeToStation_shortcuts[s_x_].end());
-                    if (x_y_ != "")path.insert(path.end(), nodeToNode_in_G_ChargeStation_shortcuts[x_y_].begin() + 1, nodeToNode_in_G_ChargeStation_shortcuts[x_y_].end());
-                    path.insert(path.end(), stationToNode_shortcuts[y_t_].begin() + 1, stationToNode_shortcuts[y_t_].end());
+                    if (x_y_ == "") {
+                        G.Query(s, x_node, path);
+                        vector<int> path1;
+                        G.Query(x_node, t, path1);
+                        path.insert(path.end(), path1.begin() + 1, path1.end());
+                    }
+                    else {
+                        G.Query(s, x_node, path);
+                        vector<int> path1;
+                        G_ChargeStation.Query(x_node, y_node, path1);
+                        decompressPath(path1);
+                        path.insert(path.end(), path1.begin() + 1, path1.end());
+                        path1.clear();
+                        G.Query(y_node, t, path1);
+                        path.insert(path.end(), path1.begin() + 1, path1.end());
+                    }
                     return sum_weight;
                 }
                 return -1;
