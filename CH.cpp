@@ -26,8 +26,11 @@ const ll INF = 1e15 + 10;  // 无穷大
 
 // ifstream graph("NY_graph.txt");  // 读取图
 // ifstream queries("Queries.txt"); // 读取查询
-ifstream graph("test1.txt");
-ifstream queries("query2.txt");
+ifstream graph("1000.txt");
+ifstream queries("query1.txt");
+
+// 创建一个ofstream对象，并打开一个名为"output.txt"的文件
+std::ofstream outFile("output.txt");
 
 class CH {
    private:
@@ -42,7 +45,6 @@ class CH {
     vector<int> contr_neighbours;                // 记录每个结点的收缩邻居数
     unordered_map<string, vector<ll>> shortcut;  // 记录捷径的原路径
     vector<vector<ll>> fa;                       // 记录节点的父节点, fa[0]:正向边父节点, fa[1]:反向边父节点
-    unordered_set<int> charging_stations;        // 充电站
 
     // 读取图(读入有向图; 如果要处理无向图则需要将每条边读入两次)
     void read() {
@@ -55,18 +57,14 @@ class CH {
                 continue;
             Connect(G[0][u], v, w);  // 正向边, 表示从结点 u 出发的正向边
             Connect(G[1][v], u, w);  // 反向边, 表示指向结点 v 的反向边
+            Connect(G[0][v], u, w);  // 无向图需要将每条边读入两次
+            Connect(G[1][u], v, w);  // 无向图需要将每条边读入两次
         }
     }
 
     // 预处理
     void preprocess() {
-        SetOrder();  // 设置结点顺序
-
-        // 添加充电站
-        for (int i = 18; i <= 25; i++) {
-            charging_stations.insert(i);
-        }
-
+        SetOrder();   // 设置结点顺序
         BuildG_CH();  // 构建 CH 图
     }
 
@@ -109,14 +107,10 @@ class CH {
 
     // 设置节点顺序
     void SetOrder() {
-        contracted.assign(n + 1, 0);  // 初始化节点收缩状态(均未收缩)
-        imp.assign(n + 1, 0);         // 初始化节点重要性
-        level.assign(n + 1, 0);       // 初始每个结点的层级
-        contr_neighbours.assign(n + 1, 0);
-
-        // // 将所有充电站设置成已收缩
-        // for (int i = 18; i <= 25; i++)
-        //     contracted[i] = true;
+        contracted.assign(n + 1, 0);        // 初始化节点收缩状态(均未收缩)
+        imp.assign(n + 1, 0);               // 初始化节点重要性
+        level.assign(n + 1, 0);             // 初始每个结点的层级
+        contr_neighbours.assign(n + 1, 0);  // 初始化每个结点的收缩邻居数
 
         for (int i = 1; i <= n; ++i)
             imp_pq.push(mp(-n, i));  // 初始化重要性优先队列(设置为 -n 保证最优先处理)
@@ -131,6 +125,7 @@ class CH {
             if (imp_pq.empty() || new_imp - imp_pq.top().fs <= 10) {
                 imp[curr_node] = order++;  // 设置节点顺序
                 contracted[curr_node] = 1;
+                // cout << "Contracted node: " << curr_node << endl;
                 ContractNode(curr_node);
             } else {
                 imp_pq.push(mp(new_imp, curr_node));  // 否则, 将当前节点重新加入优先队列
@@ -152,7 +147,7 @@ class CH {
                 u = p1.fs;
                 v = p2.fs;  // u, v 分别表示 x 的入边和出边的邻接结点(捷径u-x-v)
                 // 如果 u 和 v 都未被收缩, 则增加有效快捷路径数
-                if (!contracted[u] && !contracted[v])
+                if (!contracted[u] && !contracted[v] && u != v)
                     ++shortcuts;
             }
         }
@@ -241,6 +236,7 @@ class CH {
                     addShortcut(u, x, v);
                     Connect(G[1][v], u, new_w);
                     cout << "Added shortcut: " << u << " -> " << v << " (weight: " << new_w << ")" << endl;
+                    outFile << u << " " << v << " " << new_w << endl;
                 }
             }
         }
@@ -256,10 +252,13 @@ class CH {
             for (auto& p : G[0][u]) {
                 v = p.fs;
                 w = p.sc;
-                if (imp[v] > imp[u])
-                    G_CH[0][u].pb(mp(v, w));
-                else
-                    G_CH[1][v].pb(mp(u, w));
+                if (imp[v] > imp[u]) {
+                    G_CH[0][u].pb(mp(v, w));  // G_CH[0]向上图
+                    cout << u << "->" << v << endl;
+                } else {
+                    G_CH[1][v].pb(mp(u, w));  // G_CH[1]向下图
+                    cout << u << "->" << v << endl;
+                }
             }
         }
     }
@@ -400,8 +399,8 @@ int main() {
     ios::sync_with_stdio(0);  // 加速输入输出流
     int T = clock();
     CH G;
-    // 创建一个ofstream对象，并打开一个名为"output.txt"的文件
-    std::ofstream outFile("output.txt");
+    // // 创建一个ofstream对象，并打开一个名为"output.txt"的文件
+    // std::ofstream outFile("output.txt");
     // 检查文件是否成功打开
     if (!outFile) {
         std::cerr << "无法打开文件 output.txt" << std::endl;
@@ -453,5 +452,6 @@ int main() {
     cin.ignore();  // 暂停程序
     string term;
     getline(cin, term);
+
     return 0;
 }

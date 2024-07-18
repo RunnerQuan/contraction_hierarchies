@@ -9,9 +9,9 @@
 using namespace std;
 
 int main() {
-    const int numNodes = 1000;
-    const int numEdges = 1500;
-    const int numStations = 200;
+    const int numNodes = 2000;
+    const int numEdges = 3000;
+    const int numStations = 400;
 
     // 使用随机数生成器生成图的数据
     random_device rd;
